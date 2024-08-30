@@ -69,6 +69,8 @@ function getRequestHeaders($multipart_delimiter=NULL) {
                 // Handle application/json
                 array_push($headers, "$key: $value");
             }
+        } elseif ($key === 'REMOTE_USER') {
+            array_push($headers, "X-Forwarded-User: $value");
         }
     }
     return $headers;
