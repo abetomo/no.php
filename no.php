@@ -46,6 +46,10 @@ $url = $backend_url . $request_uri;
 function getRequestHeaders($multipart_delimiter=NULL) {
     $headers = array();
     foreach($_SERVER as $key => $value) {
+        if ($key === 'HTTP_X_FORWARDED_USER') {
+            # Ignore the "X-Forwarded-User" header requested by the user.
+            continue;
+        }
         if(preg_match("/^HTTP/", $key)) { # only keep HTTP headers
             if(preg_match("/^HTTP_HOST/", $key) == 0 && # let curl set the actual host/proxy
             preg_match("/^HTTP_ORIGIN/", $key) == 0 &&
