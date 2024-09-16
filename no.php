@@ -28,6 +28,7 @@ $backend_info = parse_url($backend_url);
 $host = $_SERVER['HTTP_HOST'];
 $request_uri = $_SERVER['REQUEST_URI'];
 $uri_rel = "subdir/no.php"; # URI to this file relative to public_html
+$is_followlocation = true;
 
 $request_includes_nophp_uri = true;
 if ( $request_includes_nophp_uri == false) {
@@ -112,7 +113,7 @@ function build_multipart_data_files($delimiter, $fields, $files) {
 
 $curl = curl_init( $url );
 curl_setopt( $curl, CURLOPT_HTTPHEADER, getRequestHeaders() );
-curl_setopt( $curl, CURLOPT_FOLLOWLOCATION, true ); # follow redirects
+curl_setopt( $curl, CURLOPT_FOLLOWLOCATION, $is_followlocation ); # follow redirects
 curl_setopt( $curl, CURLOPT_HEADER, true ); # include the headers in the output
 curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true ); # return output as string
 
