@@ -143,7 +143,7 @@ foreach ( $headers_arr as $header ) {
     if ( !preg_match( '/^Transfer-Encoding:/i', $header ) ) {
         if ( preg_match( '/^Location:/i', $header ) ) {
             # rewrite absolute local redirects to relative ones
-            $header = str_replace($backend_url, "/", $header);
+            $header = str_replace(rtrim($backend_url, '/'), '', $header);
         }
         else if ( preg_match( '/^set-cookie:/i', $header ) ) {
 			# replace original domain name in Set-Cookie headers with our server's domain
