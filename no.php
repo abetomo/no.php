@@ -85,29 +85,57 @@ function build_domain_regex($hostname)
 	$regex .= $main_domain;
 	return $regex;
 }
-  
-function build_multipart_data_files($delimiter, $fields, $files) {
-    # Inspiration from: https://gist.github.com/maxivak/18fcac476a2f4ea02e5f80b303811d5f :)
-    $data = '';
+
+function build_multipart_data_fields($delimiter, $key, $value) {
     $eol = "\r\n";
-  
-    foreach ($fields as $name => $content) {
-        $data .= "--" . $delimiter . $eol
-            . 'Content-Disposition: form-data; name="' . $name . "\"".$eol.$eol
-            . $content . $eol;
+    if (!is_array($value)) {
+        return "--" . $delimiter . $eol
+            . 'Content-Disposition: form-data; name="' . $key . '"' . $eol . $eol
+            . $value . $eol;
     }
-  
-    foreach ($files as $name => $content) {
-        $data .= "--" . $delimiter . $eol
+
+    $data = '';
+    foreach ($value as $k => $v) {
+        $data .= build_multipart_data_fields(
+            $delimiter,
+            sprintf('%s[%s]', $key, is_numeric($k) ? "" :  $k),
+            $v
+        );
+
+    }
+    return $data;
+}
+
+function build_multipart_data_files($delimiter, $fields, $files) {
+    $eol = "\r\n";
+    if (!is_array($value)) {
+        return "--" . $delimiter . $eol
             . 'Content-Disposition: form-data; name="' . $name . '"; filename="' . $name . '"' . $eol
             . 'Content-Transfer-Encoding: binary'.$eol
-            ;
-        $data .= $eol;
-        $data .= $content . $eol;
+            . $eol . $value . $eol;
     }
-    $data .= "--" . $delimiter . "--".$eol;
+    $data = '';
+    foreach ($value as $k => $v) {
+        $data .= build_multipart_data_files(
+            $delimiter,
+            sprintf('%s[%s]', $key, is_numeric($k) ? "" :  $k),
+            $v
+        );
 
+    }
     return $data;
+}
+
+function build_multipart_data($delimiter, $fields, $files) {
+    # Inspiration from: https://gist.github.com/maxivak/18fcac476a2f4ea02e5f80b303811d5f :)
+    $data = '';
+    foreach ($fields as $name => $content) {
+        $data .= build_multipart_data_fields($delimiter, $name, $content);
+    }
+    foreach ($files as $name => $content) {
+        $data .= build_multipart_data_files($delimiter, $name, $content);
+    }
+    return $data . "--" . $delimiter . "--" . $eol;
 }
 
 $curl = curl_init( $url );
@@ -122,7 +150,7 @@ if ( strtolower($_SERVER['REQUEST_METHOD']) == 'post' ) {
 
     if (preg_match("/^multipart/", strtolower($_SERVER['CONTENT_TYPE']))) {
         $delimiter = '-------------' . uniqid();
-        $post_data = build_multipart_data_files($delimiter, $_POST, $_FILES);
+        $post_data = build_multipart_data($delimiter, $_POST, $_FILES);
         curl_setopt( $curl, CURLOPT_HTTPHEADER, getRequestHeaders($delimiter) );
     }
 
