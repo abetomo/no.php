@@ -75,7 +75,14 @@ function getRequestHeaders($multipart_delimiter=NULL) {
 
 function build_domain_regex($hostname)
 {
+	if (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+		return $hostname;
+	}
 	$names = explode('.', $hostname); //assumes main domain is the TLD
+	if (count($names) === 1) {
+		return $hostname;
+	}
+
 	$regex = "";
 	for ($i= 0; $i < count ($names)-2; $i++)
 	{
