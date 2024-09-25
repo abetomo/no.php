@@ -116,8 +116,8 @@ curl_setopt( $curl, CURLOPT_FOLLOWLOCATION, true ); # follow redirects
 curl_setopt( $curl, CURLOPT_HEADER, true ); # include the headers in the output
 curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true ); # return output as string
 
-if ( strtolower($_SERVER['REQUEST_METHOD']) == 'post' ) {
-    curl_setopt( $curl, CURLOPT_POST, true );
+if (in_array(strtolower($_SERVER['REQUEST_METHOD']), ['post', 'put', 'patch', 'delete'], true)) {
+    curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, $_SERVER['REQUEST_METHOD'] );
     $post_data = file_get_contents("php://input");
 
     if (preg_match("/^multipart/", strtolower($_SERVER['CONTENT_TYPE']))) {
