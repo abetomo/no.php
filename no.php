@@ -31,7 +31,8 @@ $uri_rel = "subdir/no.php"; # URI to this file relative to public_html
 
 $request_includes_nophp_uri = true;
 if ( $request_includes_nophp_uri == false) {
-        $request_uri = str_replace( rtrim($uri_rel, '/'), '', $request_uri );
+    $pattern =  '/' . preg_quote(rtrim($uri_rel, '/'), '/') . '/';
+    $request_uri = preg_replace($pattern, '', $request_uri , 1);
 }
 
 $is_ruby_on_rails = false;
