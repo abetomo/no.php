@@ -110,13 +110,13 @@ function build_multipart_data_fields($delimiter, $key, $value) {
     }
 
     $data = '';
+    $is_array = array_key_first($value) === 0;
     foreach ($value as $k => $v) {
         $data .= build_multipart_data_fields(
             $delimiter,
-            sprintf('%s[%s]', $key, is_numeric($k) ? "" :  $k),
+            sprintf('%s[%s]', $key, $is_array ? '' :  $k),
             $v
         );
-
     }
     return $data;
 }
@@ -130,13 +130,13 @@ function build_multipart_data_files($delimiter, $name, $value) {
             . $eol . $value . $eol;
     }
     $data = '';
+    $is_array = array_key_first($value) === 0;
     foreach ($value as $k => $v) {
         $data .= build_multipart_data_files(
             $delimiter,
-            sprintf('%s[%s]', $name, is_numeric($k) ? "" :  $k),
+            sprintf('%s[%s]', $name, $is_array ? '' :  $k),
             $v
         );
-
     }
     return $data;
 }
