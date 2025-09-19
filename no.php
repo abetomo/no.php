@@ -106,7 +106,7 @@ function build_multipart_data_fields($delimiter, $key, $value) {
     return $data;
 }
 
-function build_multipart_data_files($delimiter, $fields, $files) {
+function build_multipart_data_files($delimiter, $name, $value) {
     $eol = "\r\n";
     if (!is_array($value)) {
         return "--" . $delimiter . $eol
@@ -118,7 +118,7 @@ function build_multipart_data_files($delimiter, $fields, $files) {
     foreach ($value as $k => $v) {
         $data .= build_multipart_data_files(
             $delimiter,
-            sprintf('%s[%s]', $key, is_numeric($k) ? "" :  $k),
+            sprintf('%s[%s]', $name, is_numeric($k) ? "" :  $k),
             $v
         );
 
@@ -129,6 +129,7 @@ function build_multipart_data_files($delimiter, $fields, $files) {
 function build_multipart_data($delimiter, $fields, $files) {
     # Inspiration from: https://gist.github.com/maxivak/18fcac476a2f4ea02e5f80b303811d5f :)
     $data = '';
+    $eol = "\r\n";
     foreach ($fields as $name => $content) {
         $data .= build_multipart_data_fields($delimiter, $name, $content);
     }
