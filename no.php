@@ -122,13 +122,18 @@ function build_multipart_data_fields($delimiter, $key, $value) {
 }
 
 function build_multipart_data_files($delimiter, $name, $value) {
-    $eol = "\r\n";
     if (!is_array($value)) {
-        return "--" . $delimiter . $eol
-            . 'Content-Disposition: form-data; name="' . $name . '"; filename="' . $name . '"' . $eol
-            . 'Content-Transfer-Encoding: binary'.$eol
-            . $eol . $value . $eol;
+        return '';
     }
+
+    $eol = "\r\n";
+    if (isset($value['tmp_name']) && !is_array($value['tmp_name']) && file_exists($value['tmp_name'])) {
+        return "--" . $delimiter . $eol
+            . 'Content-Disposition: form-data; name="' . $name . '"; filename="' . $value['name'] . '"' . $eol
+            . 'Content-Transfer-Encoding: binary'.$eol
+            . $eol . file_get_contents($value['tmp_name']) . $eol;
+    }
+
     $data = '';
     $is_array = array_key_first($value) === 0;
     foreach ($value as $k => $v) {
