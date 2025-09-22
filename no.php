@@ -110,6 +110,11 @@ function build_multipart_data_files($delimiter, $fields, $files) {
     return $data;
 }
 
+function get_base_url($parsed_url) {
+    $port = isset($parsed_url['port']) ? ":$parsed_url[port]" : '';
+    return "$parsed_url[scheme]://$parsed_url[host]$port";
+}
+
 $curl = curl_init( $url );
 curl_setopt( $curl, CURLOPT_HTTPHEADER, getRequestHeaders() );
 curl_setopt( $curl, CURLOPT_FOLLOWLOCATION, true ); # follow redirects
@@ -143,7 +148,7 @@ foreach ( $headers_arr as $header ) {
     if ( !preg_match( '/^Transfer-Encoding:/i', $header ) ) {
         if ( preg_match( '/^Location:/i', $header ) ) {
             # rewrite absolute local redirects to relative ones
-            $header = str_replace(rtrim($backend_url, '/'), '', $header);
+            $header = str_replace(get_base_url($backend_info), '', $header);
         }
         else if ( preg_match( '/^set-cookie:/i', $header ) ) {
 			# replace original domain name in Set-Cookie headers with our server's domain
