@@ -23,14 +23,14 @@
  */
 
 
-$backend_url = "https://myapp.backend.com:3000/";
+$backend_url = "http://localhost:3011/redmine";
 $backend_info = parse_url($backend_url);
 $host = $_SERVER['HTTP_HOST'];
 $request_uri = $_SERVER['REQUEST_URI'];
-$uri_rel = "subdir/no.php"; # URI to this file relative to public_html
-$is_followlocation = true;
+$uri_rel = "/redmine"; # URI to this file relative to public_html
+$is_followlocation = false;
 
-$request_includes_nophp_uri = true;
+$request_includes_nophp_uri = false;
 if ( $request_includes_nophp_uri == false) {
     $pattern =  '/' . preg_quote(rtrim($uri_rel, '/'), '/') . '/';
     $request_uri = preg_replace($pattern, '', $request_uri , 1);
@@ -170,8 +170,14 @@ curl_setopt( $curl, CURLOPT_FOLLOWLOCATION, $is_followlocation ); # follow redir
 curl_setopt( $curl, CURLOPT_HEADER, true ); # include the headers in the output
 curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true ); # return output as string
 
+
+curl_setopt($curl, CURLOPT_VERBOSE, true);
+$verbose_fh = fopen('php://temp', 'rw+');
+curl_setopt($curl, CURLOPT_STDERR, $verbose_fh);
+
+
 if (in_array(strtolower($_SERVER['REQUEST_METHOD']), ['post', 'put', 'patch', 'delete'], true)) {
-    curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, $_SERVER['REQUEST_METHOD'] );
+    // curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, $_SERVER['REQUEST_METHOD'] );
     $post_data = file_get_contents("php://input");
 
     if (preg_match("/^multipart/", strtolower($_SERVER['CONTENT_TYPE']))) {
@@ -183,7 +189,11 @@ if (in_array(strtolower($_SERVER['REQUEST_METHOD']), ['post', 'put', 'patch', 'd
     curl_setopt( $curl, CURLOPT_POSTFIELDS, $post_data );
 }
   
+
 $contents = curl_exec( $curl ); # reverse proxy. the actual request to the backend server.
+rewind($verbose_fh);
+error_log(stream_get_contents($verbose_fh));
+fclose($verbose_fh);
 curl_close( $curl ); # curl is done now
 
 
