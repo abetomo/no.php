@@ -45,6 +45,11 @@ if ( $is_ruby_on_rails == true) {
 $url = $backend_url . $request_uri;
 
 
+error_log(json_encode($_SERVER) . "\n");
+error_log(json_encode($_REQUEST) . "\n");
+error_log(json_encode($_FILES) . "\n");
+
+
 function getRequestHeaders($multipart_delimiter=NULL) {
     $headers = array();
     foreach($_SERVER as $key => $value) {
@@ -177,7 +182,7 @@ curl_setopt($curl, CURLOPT_STDERR, $verbose_fh);
 
 
 if (in_array(strtolower($_SERVER['REQUEST_METHOD']), ['post', 'put', 'patch', 'delete'], true)) {
-    // curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, $_SERVER['REQUEST_METHOD'] );
+    curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, $_SERVER['REQUEST_METHOD'] );
     $post_data = file_get_contents("php://input");
 
     if (preg_match("/^multipart/", strtolower($_SERVER['CONTENT_TYPE']))) {
