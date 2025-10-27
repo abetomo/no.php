@@ -23,11 +23,11 @@
  */
 
 
-$backend_url = "https://myapp.backend.com:3000/";
+$backend_url = "http://localhost:3011/redmine";
 $backend_info = parse_url($backend_url);
 $host = $_SERVER['HTTP_HOST'];
-$uri_rel = "subdir/no.php"; # URI to this file relative to public_html
-$is_followlocation = true;
+$uri_rel = "/redmine"; # URI to this file relative to public_html
+$is_followlocation = false;
 
 // When using IIS with URL Rewrite, URL encoding may not work as expected, so use `UNENCODED_URL` instead.
 // https://learn.microsoft.com/en-us/iis/extensions/url-rewrite-module/url-rewrite-module-configuration-reference#preserving-original-url
@@ -37,7 +37,7 @@ if (isset($_SERVER['UNENCODED_URL']) && !empty($_SERVER['UNENCODED_URL'])) {
     $request_uri = $_SERVER['REQUEST_URI'];
 }
 
-$request_includes_nophp_uri = true;
+$request_includes_nophp_uri = false;
 if ( $request_includes_nophp_uri == false) {
     $pattern =  '/' . preg_quote(rtrim($uri_rel, '/'), '/') . '/';
     $request_uri = preg_replace($pattern, '', $request_uri , 1);
