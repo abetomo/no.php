@@ -26,8 +26,15 @@
 $backend_url = "https://myapp.backend.com:3000/";
 $backend_info = parse_url($backend_url);
 $host = $_SERVER['HTTP_HOST'];
-$request_uri = $_SERVER['REQUEST_URI'];
 $uri_rel = "subdir/no.php"; # URI to this file relative to public_html
+
+// When using IIS with URL Rewrite, URL encoding may not work as expected, so use `UNENCODED_URL` instead.
+// https://learn.microsoft.com/en-us/iis/extensions/url-rewrite-module/url-rewrite-module-configuration-reference#preserving-original-url
+if (isset($_SERVER['UNENCODED_URL']) && !empty($_SERVER['UNENCODED_URL'])) {
+    $request_uri =  $_SERVER['UNENCODED_URL'];
+} else {
+    $request_uri = $_SERVER['REQUEST_URI'];
+}
 
 $request_includes_nophp_uri = true;
 if ( $request_includes_nophp_uri == false) {
