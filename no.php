@@ -36,6 +36,7 @@ if (isset($_SERVER['UNENCODED_URL']) && !empty($_SERVER['UNENCODED_URL'])) {
 } else {
     $request_uri = $_SERVER['REQUEST_URI'];
 }
+$params_hash_keys = [];
 
 $request_includes_nophp_uri = true;
 if ( $request_includes_nophp_uri == false) {
@@ -104,6 +105,8 @@ function build_domain_regex($hostname)
 }
 
 function build_multipart_data_fields($delimiter, $key, $value) {
+    global $params_hash_keys;
+
     $eol = "\r\n";
     if (!is_array($value)) {
         return "--" . $delimiter . $eol
@@ -112,7 +115,7 @@ function build_multipart_data_fields($delimiter, $key, $value) {
     }
 
     $data = '';
-    $is_array = array_key_first($value) === 0;
+    $is_array = array_key_first($value) === 0 && !in_array($key, $params_hash_keys);
     foreach ($value as $k => $v) {
         $data .= build_multipart_data_fields(
             $delimiter,
@@ -124,6 +127,8 @@ function build_multipart_data_fields($delimiter, $key, $value) {
 }
 
 function build_multipart_data_files($delimiter, $name, $value) {
+    global $params_hash_keys;
+
     if (!is_array($value)) {
         return '';
     }
@@ -137,7 +142,7 @@ function build_multipart_data_files($delimiter, $name, $value) {
     }
 
     $data = '';
-    $is_array = array_key_first($value) === 0;
+    $is_array = array_key_first($value) === 0 && !in_array($name, $params_hash_keys);
     foreach ($value as $k => $v) {
         $data .= build_multipart_data_files(
             $delimiter,
