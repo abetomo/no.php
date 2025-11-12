@@ -36,7 +36,7 @@ if (isset($_SERVER['UNENCODED_URL']) && !empty($_SERVER['UNENCODED_URL'])) {
 } else {
     $request_uri = $_SERVER['REQUEST_URI'];
 }
-$params_hash_keys = ['extension[tags]'];
+$params_hash_keys = ['extension[tags]', 'issue[checklists_attributes]'];
 
 $request_includes_nophp_uri = false;
 if ( $request_includes_nophp_uri == false) {
